@@ -14,6 +14,7 @@ import Job from "./components/Job";
 import { logout } from "./slices/auth";
 
 import EventBus from "./common/EventBus";
+import Note from "./components/Note";
 
 const App = () => {
   const { user: currentUser } = useSelector((state) => state.auth);
@@ -79,6 +80,7 @@ const App = () => {
             <Route path="/register" element={<Register />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/job" element={<Job />} />
+            <Route path="/note" element={<Note />} />
           </Routes>
         </div>
       </div>
