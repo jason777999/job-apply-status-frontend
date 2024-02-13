@@ -75,12 +75,10 @@ const App = () => {
 
         <div className="container mt-3">
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Job />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/job" element={<Job />} />
-            <Route path="/note" element={<Note />} />
           </Routes>
         </div>
       </div>

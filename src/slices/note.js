@@ -8,6 +8,7 @@ export const fetchNoteList = createAsyncThunk(
   async ({}, thunkAPI) => {
     try {
       const response = await NoteService.getNoteList();
+      console.log("First response", response);
       if (response.data.success) {
         return response.data;
       } else {
@@ -51,6 +52,31 @@ export const addNote = createAsyncThunk(
   }
 );
 
+export const deleteNote = createAsyncThunk(
+  "job/deleteNote",
+  async ({ noteId }, thunkAPI) => {
+    try {
+      const response = await NoteService.deleteNote({ noteId });
+      // console.log("First response", response);
+      if (response.data.success) {
+        return response.data;
+      } else {
+        thunkAPI.dispatch(setMessage(response.data.message));
+        return thunkAPI.rejectWithValue();
+      }
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      thunkAPI.dispatch(setMessage(message));
+      return thunkAPI.rejectWithValue();
+    }
+  }
+);
+
 const initialState = {
   notes: [],
 };
@@ -64,7 +90,7 @@ const noteSlice = createSlice({
     },
     [fetchNoteList.fulfilled]: (state, action) => {
       state.isLoading = false;
-      state.notes = [...action.notes];
+      state.notes = [...action.payload.notes];
     },
     [fetchNoteList.rejected]: (state, action) => {
       state.isLoading = false;
@@ -75,10 +101,25 @@ const noteSlice = createSlice({
     },
     [addNote.fulfilled]: (state, action) => {
       state.isLoading = false;
-      state.notes = [...state.notes, action.note];
+      state.notes = [...state.notes, action.payload.note];
     },
     [addNote.rejected]: (state, action) => {
       state.isLoading = false;
+    },
+
+    [deleteNote.rejected]: (state, action) => {
+      state.isLoading = false;
+    },
+    [deleteNote.fulfilled]: (state, action) => {
+      state.isLoading = false;
+      let index = state.notes.findIndex(
+        (item) => item._id === action.payload.removed._id
+      );
+
+      state.notes.splice(index, 1);
+    },
+    [deleteNote.pending]: (state, action) => {
+      state.isLoading = true;
     },
   },
 });

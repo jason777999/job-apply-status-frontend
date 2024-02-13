@@ -4,12 +4,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { clearMessage, setMessage } from "../slices/message";
 import { addJobList, fetchJobList, removeJobList } from "../slices/job";
 import _ from "lodash";
+import JobItem from "./JobItem";
+import Note from "./Note";
 
 const Job = () => {
   const dispatch = useDispatch();
 
   // store data
-  const { user: currentUser } = useSelector((state) => state.auth);
+  const { user: currentUser, isLoggedIn } = useSelector((state) => state.auth);
   const { jobList } = useSelector((state) => state.job);
 
   // state
@@ -54,64 +56,43 @@ const Job = () => {
     }
   };
 
-  const handleCheck = (checked, link) => {
-    checked = !checked;
-    if (checked) {
-      console.log("Checked. so uncheck it!");
-      dispatch(removeJobList({ link, linker: currentUser }))
-        .unwrap()
-        .then(() => {})
-        .catch(() => {
-          console.log("Error occurs!");
-        });
-    } else {
-      dispatch(addJobList({ link, linker: currentUser }))
-        .unwrap()
-        .then(() => {
-          setNewLink("");
-        })
-        .catch(() => {
-          console.log("Error occurs!");
-        });
-    }
-  };
-
-  // redirection
-  if (!currentUser) {
-    return <Navigate to="/login" />;
-  }
-
   return (
     <div className="container">
       <header className="jumbotron">
         <h3>JOB</h3>
-        <div>
-          {jobList &&
-            jobList.length > 0 &&
-            jobList.map(({ _id, link, applied }) => {
-              return (
-                <div key={_id}>
-                  <input
-                    type="checkbox"
-                    checked={applied}
-                    onChange={({ target: { checked } }) =>
-                      handleCheck(checked, link)
-                    }
-                  />
-                  <a href={link} target="blink">
-                    {link}
-                  </a>
-                </div>
-              );
-            })}
-        </div>
-        <input
-          type="text"
-          value={newLink}
-          onChange={handleChange}
-          onKeyPress={handleKeyPress}
-        />
       </header>
+      <main style={{ display: "flex" }}>
+        <div style={{ flexGrow: 1 }}>
+          <div>
+            {jobList &&
+              jobList.length > 0 &&
+              jobList.map(({ _id, link, applied }) => {
+                return (
+                  <JobItem
+                    id={_id}
+                    link={link}
+                    applied={applied}
+                    key={_id}
+                    user={currentUser}
+                  />
+                );
+              })}
+          </div>
+          <div>
+            {isLoggedIn && (
+              <input
+                type="text"
+                value={newLink}
+                onChange={handleChange}
+                onKeyPress={handleKeyPress}
+              />
+            )}
+          </div>
+        </div>
+        <div style={{ width: "280px" }}>
+          <Note />
+        </div>
+      </main>
     </div>
   );
 };
