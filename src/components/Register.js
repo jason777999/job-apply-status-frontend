@@ -5,6 +5,7 @@ import * as Yup from "yup";
 
 import { register } from "../slices/auth";
 import { clearMessage } from "../slices/message";
+import { Typography } from "@mui/material";
 
 const Register = () => {
   const [successful, setSuccessful] = useState(false);
@@ -42,15 +43,17 @@ const Register = () => {
   };
 
   return (
-    <div className="col-md-12 signup-form">
-      <div className="card card-container">
-        <h1>Register</h1>
+    <div className="w-full flex justify-center">
+      <div className="w-[370px]">
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
           onSubmit={handleRegister}
         >
           <Form>
+            <Typography variant="h4" className="text-center pb-8 pt-8">
+              Register
+            </Typography>
             {!successful && (
               <div>
                 <div className="form-group">

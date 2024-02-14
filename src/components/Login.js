@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, useNavigate } from "react-router-dom";
 import { Formik, Field, Form, ErrorMessage } from "formik";
+import { Typography } from "@mui/material";
 import * as Yup from "yup";
 
 import { login } from "../slices/auth";
@@ -37,10 +38,7 @@ const Login = () => {
 
     dispatch(login({ email }))
       .unwrap()
-      .then(() => {
-        // navigate("/profile");
-        // window.location.reload();
-      })
+      .then(() => {})
       .catch(() => {
         setLoading(false);
       });
@@ -51,14 +49,17 @@ const Login = () => {
   }
 
   return (
-    <div className="col-md-12 login-form">
-      <div className="card card-container">
+    <div className="w-full flex justify-center">
+      <div className="w-[370px]">
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
           onSubmit={handleLogin}
         >
           <Form>
+            <Typography variant="h4" className="text-center pb-8 pt-8">
+              Login
+            </Typography>
             <div className="form-group">
               <label htmlFor="email">Email</label>
               <Field name="email" type="text" className="form-control" />

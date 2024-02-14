@@ -6,6 +6,14 @@ import { addJobList, fetchJobList, removeJobList } from "../slices/job";
 import _ from "lodash";
 import JobItem from "./JobItem";
 import Note from "./Note";
+import { Input, TextField, Typography } from "@mui/material";
+import AppInputText from "../shared-component/Input";
+import { isValidUrl } from "../common/utils";
+import { addNote } from "../slices/note";
+import Scrollbar from "../shared-component/Scrollbar";
+import { TransitionGroup } from "react-transition-group";
+import Collapse from "@mui/material/Collapse";
+import { NotificationManager } from "react-notifications";
 
 const Job = () => {
   const dispatch = useDispatch();
@@ -26,7 +34,9 @@ const Job = () => {
     dispatch(fetchJobList({}))
       .unwrap()
       .then(() => {})
-      .catch(() => {});
+      .catch((msg) => {
+        NotificationManager.error(msg);
+      });
   }, [dispatch]);
 
   // state handle methods
@@ -40,33 +50,50 @@ const Job = () => {
   };
 
   const handleChange = (event) => {
+    event.preventDefault();
     setNewLink(event.target.value);
   };
 
-  const handleKeyPress = (event) => {
-    if (event.key === "Enter") {
+  const addNewContent = () => {
+    if (isValidUrl(newLink)) {
       dispatch(addJobList({ link: newLink, linker: currentUser }))
         .unwrap()
         .then(() => {
           setNewLink("");
+          NotificationManager.success("New Link Added");
         })
-        .catch(() => {
-          console.log("Error occurs!");
+        .catch((msg) => {
+          NotificationManager.error(msg);
+        });
+    } else {
+      dispatch(addNote({ text: newLink, email: currentUser.email }))
+        .unwrap()
+        .then(() => {
+          setNewLink("");
+          NotificationManager.success("New Note Added");
+        })
+        .catch((err) => {
+          NotificationManager.error(err);
         });
     }
   };
 
+  const handleKeyPress = (event) => {
+    if (event.key === "Enter") {
+      addNewContent();
+    }
+  };
+
   return (
-    <div className="container">
-      <header className="jumbotron">
-        <h3>JOB</h3>
-      </header>
-      <main style={{ display: "flex" }}>
-        <div style={{ flexGrow: 1 }}>
-          <div>
-            {jobList &&
-              jobList.length > 0 &&
-              jobList.map(({ _id, link, applied }) => {
+    <div className="w-full flex h-full ">
+      <div className="flex-grow h-full  bg-[#313338] relative">
+        <div
+          className="flex flex-col pl-3 pr-3 relative pt-2"
+          style={{ paddingBottom: "8px", height : isLoggedIn ? '550px' : "610px" }}
+        >
+          <Scrollbar>
+            {jobList && jobList.length > 0 ? (
+              jobList.map(({ _id, link, applied }, index) => {
                 return (
                   <JobItem
                     id={_id}
@@ -74,25 +101,35 @@ const Job = () => {
                     applied={applied}
                     key={_id}
                     user={currentUser}
+                    index={index}
                   />
                 );
-              })}
-          </div>
-          <div>
-            {isLoggedIn && (
-              <input
-                type="text"
-                value={newLink}
-                onChange={handleChange}
-                onKeyPress={handleKeyPress}
-              />
+              })
+            ) : (
+              <div>
+                <Typography
+                  variant="h3"
+                  className="text-center text-[#f2f3f5] pt-2"
+                >
+                  There is no data
+                </Typography>
+              </div>
             )}
+          </Scrollbar>
+        </div>
+
+        {isLoggedIn && (
+          <div className="w-full absolute bottom-0 left-0 p-[15px] ">
+            <AppInputText
+              value={newLink}
+              onChange={handleChange}
+              onKeyPress={handleKeyPress}
+              onButtonClick={() => addNewContent()}
+            />
           </div>
-        </div>
-        <div style={{ width: "280px" }}>
-          <Note />
-        </div>
-      </main>
+        )}
+      </div>
+      <Note />
     </div>
   );
 };

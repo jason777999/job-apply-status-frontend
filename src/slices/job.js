@@ -11,7 +11,7 @@ export const fetchJobList = createAsyncThunk(
       if (response.data.success) {
         return response.data;
       } else {
-        return thunkAPI.rejectWithValue();
+        return thunkAPI.rejectWithValue(response.data.message);
       }
     } catch (error) {
       const message =
@@ -20,8 +20,7 @@ export const fetchJobList = createAsyncThunk(
           error.response.data.message) ||
         error.message ||
         error.toString();
-      thunkAPI.dispatch(setMessage(message));
-      return thunkAPI.rejectWithValue();
+      return thunkAPI.rejectWithValue(message);
     }
   }
 );
@@ -35,8 +34,7 @@ export const addJobList = createAsyncThunk(
       if (response.data.success) {
         return response.data;
       } else {
-        thunkAPI.dispatch(setMessage(response.data.message));
-        return thunkAPI.rejectWithValue();
+        return thunkAPI.rejectWithValue(response.data.message);
       }
     } catch (error) {
       const message =
@@ -45,8 +43,7 @@ export const addJobList = createAsyncThunk(
           error.response.data.message) ||
         error.message ||
         error.toString();
-      thunkAPI.dispatch(setMessage(message));
-      return thunkAPI.rejectWithValue();
+      return thunkAPI.rejectWithValue(message);
     }
   }
 );
@@ -60,8 +57,7 @@ export const removeJobList = createAsyncThunk(
       if (response.data.success) {
         return response.data;
       } else {
-        thunkAPI.dispatch(setMessage(response.data.message));
-        return thunkAPI.rejectWithValue();
+        return thunkAPI.rejectWithValue(response.data.message);
       }
     } catch (error) {
       const message =
@@ -70,8 +66,8 @@ export const removeJobList = createAsyncThunk(
           error.response.data.message) ||
         error.message ||
         error.toString();
-      thunkAPI.dispatch(setMessage(message));
-      return thunkAPI.rejectWithValue();
+
+      return thunkAPI.rejectWithValue(message);
     }
   }
 );

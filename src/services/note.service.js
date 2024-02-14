@@ -2,8 +2,8 @@ import axios from "axios";
 
 const API_URL = "http://localhost:5000/api/note";
 
-const getNoteList = () => {
-  return axios.get(API_URL);
+const getNoteList = ({ searchKeyword }) => {
+  return axios.post(API_URL, { searchKeyword });
 };
 
 const addNote = ({ text, email }) => {

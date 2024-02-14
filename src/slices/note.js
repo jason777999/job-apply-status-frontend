@@ -4,10 +4,10 @@ import NoteService from "../services/note.service";
 import _ from "lodash";
 
 export const fetchNoteList = createAsyncThunk(
-  "job/fetchNoteList",
-  async ({}, thunkAPI) => {
+  "node/fetchNoteList",
+  async ({ searchKeyword }, thunkAPI) => {
     try {
-      const response = await NoteService.getNoteList();
+      const response = await NoteService.getNoteList({searchKeyword});
       console.log("First response", response);
       if (response.data.success) {
         return response.data;
@@ -28,7 +28,7 @@ export const fetchNoteList = createAsyncThunk(
 );
 
 export const addNote = createAsyncThunk(
-  "job/addNote",
+  "node/addNote",
   async ({ text, email }, thunkAPI) => {
     try {
       const response = await NoteService.addNote({ text, email });
@@ -53,7 +53,7 @@ export const addNote = createAsyncThunk(
 );
 
 export const deleteNote = createAsyncThunk(
-  "job/deleteNote",
+  "node/deleteNote",
   async ({ noteId }, thunkAPI) => {
     try {
       const response = await NoteService.deleteNote({ noteId });
@@ -62,7 +62,7 @@ export const deleteNote = createAsyncThunk(
         return response.data;
       } else {
         thunkAPI.dispatch(setMessage(response.data.message));
-        return thunkAPI.rejectWithValue();
+        return thunkAPI.rejectWithValue(response.data.message);
       }
     } catch (error) {
       const message =
@@ -79,11 +79,25 @@ export const deleteNote = createAsyncThunk(
 
 const initialState = {
   notes: [],
+  currentNote: null,
 };
 
 const noteSlice = createSlice({
   name: "note",
   initialState,
+  reducers: {
+    setCurrentNote(state, action) {
+      console.log("set current...", action, state);
+      if (action.payload !== undefined && action.payload.id !== undefined) {
+        let index = state.notes.findIndex(
+          (item) => item._id === action.payload.id
+        );
+        state.currentNote = state.notes[index];
+      } else {
+        state.currentNote = null;
+      }
+    },
+  },
   extraReducers: {
     [fetchNoteList.pending]: (state, action) => {
       state.isLoading = true;
@@ -125,4 +139,5 @@ const noteSlice = createSlice({
 });
 
 const { reducer } = noteSlice;
+export const { setCurrentNote } = noteSlice.actions;
 export default reducer;
